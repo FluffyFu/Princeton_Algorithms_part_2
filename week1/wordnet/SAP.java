@@ -12,7 +12,6 @@ import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
 public class SAP {
-
     private Digraph G;
     private int V;
     private int E;
@@ -28,14 +27,15 @@ public class SAP {
     length and ancestor function need to be modified so that bfs would not be call in both.
      */
     public int length(int v, int w) {
-        connectedComponent ccV = new connectedComponent(v);
-        connectedComponent ccW = new connectedComponent(w);
+        ConnectedComponent ccV = new ConnectedComponent(v);
+        ConnectedComponent ccW = new ConnectedComponent(w);
         int shortestLen = Integer.MAX_VALUE;
         int ancestor = -1;
 
 
         SET<Integer> markedV = ccV.marked();
         SET<Integer> markedW = ccW.marked();
+
         for (int s : markedV) {
             if (markedW.contains(s)) {
                 int length = ccV.distTo(s) + ccW.distTo(s);
@@ -56,8 +56,8 @@ public class SAP {
     }
 
     public int ancestor(int v, int w) {
-        connectedComponent ccV = new connectedComponent(v);
-        connectedComponent ccW = new connectedComponent(w);
+        ConnectedComponent ccV = new ConnectedComponent(v);
+        ConnectedComponent ccW = new ConnectedComponent(w);
         int shortestLen = Integer.MAX_VALUE;
         int ancestor = -1;
 
@@ -77,8 +77,38 @@ public class SAP {
     }
 
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
-        connectedComponent ccV = new connectedComponent(v);
-        connectedComponent ccW = new connectedComponent(w);
+        ConnectedComponent ccV = new ConnectedComponent(v);
+        ConnectedComponent ccW = new ConnectedComponent(w);
+
+        int shortestLen = Integer.MAX_VALUE;
+        int ancestor = -1;
+
+        SET<Integer> markedV = ccV.marked();
+        SET<Integer> markedW = ccW.marked();
+
+
+        for (int s : markedV) {
+            if (markedW.contains(s)) {
+                int length = ccV.distTo(s) + ccW.distTo(s);
+                if (length < shortestLen) {
+                    shortestLen = length;
+                    ancestor = s;
+                }
+            }
+        }
+        // no such path
+        if (ancestor == -1) {
+            return -1;
+        }
+        else {
+            return shortestLen;
+        }
+
+    }
+
+    public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
+        ConnectedComponent ccV = new ConnectedComponent(v);
+        ConnectedComponent ccW = new ConnectedComponent(w);
 
         int shortestLen = Integer.MAX_VALUE;
         int ancestor = -1;
@@ -95,29 +125,6 @@ public class SAP {
                 }
             }
         }
-        return shortestLen;
-
-    }
-
-    public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
-        connectedComponent ccV = new connectedComponent(v);
-        connectedComponent ccW = new connectedComponent(w);
-
-        int shortestLen = Integer.MAX_VALUE;
-        int ancestor = -1;
-
-        SET<Integer> markedV = ccV.marked();
-        SET<Integer> markedW = ccW.marked();
-
-        for (int s : markedV) {
-            if (markedV.contains(s)) {
-                int length = ccV.distTo(s) + ccW.distTo(s);
-                if (length < shortestLen) {
-                    shortestLen = length;
-                    ancestor = s;
-                }
-            }
-        }
         return ancestor;
 
     }
@@ -125,22 +132,22 @@ public class SAP {
     /*
     perform bfs on G from vertex v.
      */
-    private class connectedComponent {
+    private class ConnectedComponent {
         private SET<Integer> marked = new SET<Integer>();
         private int[] distTo = new int[V];
         private int start;
         private Iterable<Integer> startMulti;
 
-        public connectedComponent(int v) {
+        public ConnectedComponent(int v) {
             validateVertex(v);
             start = v;
-            bfs_single_source();
+            bfsSingleSource();
         }
 
-        public connectedComponent(Iterable<Integer> vertices) {
+        public ConnectedComponent(Iterable<Integer> vertices) {
             validateVertex(vertices);
             startMulti = vertices;
-            bfs_multi_source();
+            bfsMultiSource();
         }
 
         public SET<Integer> marked() {
@@ -156,7 +163,7 @@ public class SAP {
             return start;
         }
 
-        private void bfs_single_source() {
+        private void bfsSingleSource() {
             Queue<Integer> q = new Queue<Integer>();
             marked.add(start);
             distTo[start] = 0;
@@ -175,7 +182,7 @@ public class SAP {
 
         }
 
-        private void bfs_multi_source() {
+        private void bfsMultiSource() {
             Queue<Integer> q = new Queue<Integer>();
             for (int s : startMulti) {
                 marked.add(s);
@@ -218,6 +225,17 @@ public class SAP {
         while (!StdIn.isEmpty()) {
             int v = StdIn.readInt();
             int w = StdIn.readInt();
+            // test acestor methods works for iterable input
+            /*
+            SET<Integer> vCluster = new SET<Integer>();
+            SET<Integer> wCluster = new SET<Integer>();
+
+            vCluster.add(v);
+            wCluster.add(w);
+
+            int length = sap.length(vCluster, wCluster);
+            int ancestor = sap.ancestor(vCluster, wCluster);
+            */
             int length = sap.length(v, w);
             int ancestor = sap.ancestor(v, w);
             StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);

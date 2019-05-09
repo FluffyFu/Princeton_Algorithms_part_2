@@ -8,6 +8,8 @@ import edu.princeton.cs.algs4.Bag;
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.SeparateChainingHashST;
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
 
 public class WordNet {
     // stores the mapping from index to string
@@ -32,7 +34,7 @@ public class WordNet {
 
             for (int i = 0; i < words.length; i++) {
                 if (!wordMap.contains(words[i])) {
-                    wordMap.put(words[i], new Bag<Integer>())
+                    wordMap.put(words[i], new Bag<Integer>());
                 }
                 wordMap.get(words[i]).add(id);
             }
@@ -81,6 +83,24 @@ public class WordNet {
     }
 
     public static void main(String[] args) {
+        String synsetsName = args[0];
+        String hypernymsName = args[1];
+
+        WordNet wn = new WordNet(synsetsName, hypernymsName);
+        StdOut.printf("Please type two words ...\n");
+        while (!StdIn.isEmpty()) {
+            String word1 = StdIn.readString();
+            String word2 = StdIn.readString();
+            // verify both nouns are in the tree
+            if (wn.isNoun(word1) && wn.isNoun(word2)) {
+                int dist = wn.distance(word1, word2);
+                String ancestor = wn.sap(word1, word2);
+                StdOut.printf("The distance is %d and the common ancestor is %s", dist, ancestor);
+            }
+            else {
+                StdOut.printf("Not all the input words are in the synset.");
+            }
+        }
 
     }
 }
